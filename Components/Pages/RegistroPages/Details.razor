@@ -1,0 +1,51 @@
+﻿@page "/Combo/Details/{id:int}"
+@using LiamellCruz_Ap1_P2.Models
+@using LiamellCruz_Ap1_P2.Service
+@inject ComboService comboService
+@inject NavigationManager navigationManager
+@rendermode InteractiveServer
+
+
+<PageTitle>Details</PageTitle>
+<div class="container">
+	<div class="shadow-lg">
+		@*Header*@
+		<div class="card-header text-center">
+			<h3><strong>Datos del Combo</strong></h3>
+		</div>
+		@*Body*@
+		<div class="card-body">
+			<ul class="mt-5">
+				<li><strong>Id: </strong>@Combo.ComboId</li>
+				<li><strong>Fecha:  </strong>@Combo.Fecha</li>
+				<li><strong>Descripcion: </strong>@Combo.Descripcion</li>
+				<li><strong>Precio: </strong>@Combo.Precio</li>
+			</ul>
+		</div>
+		@*Footer*@
+		<div class="card-footer text-center">
+			<button type="button" class="btn btn-primary" @onclick="Volver">Volver</button>
+		</div>
+	</div>
+</div>
+
+
+
+@code {
+	[Parameter]
+	public int ComboId { get; set; }
+
+	public Combo Combo { get; set; } = new Combo();
+
+	protected override async Task OnInitializedAsync()
+	{
+		Combo = await comboService.Buscar(ComboId);
+	}
+
+	public void Volver()
+	{
+		navigationManager.NavigateTo("/Combo/Index");
+	}
+
+
+}

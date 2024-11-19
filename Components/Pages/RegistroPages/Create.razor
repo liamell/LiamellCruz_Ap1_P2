@@ -1,0 +1,84 @@
+﻿@page "/Combo/Create"
+@using LiamellCruz_Ap1_P2.Models
+@using LiamellCruz_Ap1_P2.Service
+@inject ComboService comboService
+@inject NavigationManager navigationManager
+@rendermode InteractiveServer
+
+
+<PageTitle>Create</PageTitle>
+<EditForm Model="Combo" OnValidSubmit="Guardar">
+    <DataAnnotationsValidator />
+    @*Formulario*@
+    <div class="container">
+        <div class="shadow-lg">
+            @*Header*@
+            <div class="card-header text-center">
+                <h3><strong>Crear Combo</strong></h3>
+            </div>
+            @*Body*@
+            <div class="card-body">
+                <div class="row">
+                    @*Id*@
+                    <div class="col-1">
+                        <label class="form-label"><strong>ComboId</strong></label>
+                        <InputNumber class="form-control" @bind-Value="Combo.ComboId" readonly></InputNumber>
+                    </div>
+
+                    @*Fecha*@
+                    <div class="mb-3">
+                        <label class="form-label"><strong>Fecha</strong></label>
+                        <InputDate class="form-control" @bind-Value="Combo.Fecha"></InputDate>
+                    </div>
+
+                    @*Descripcion*@
+                    <div class="col-3 ms-5">
+                        <label class="form-label"><strong>Descripcion</strong></label>
+                        <InputText class="form-control" @bind-Value="Combo.Descripcion"></InputText>
+                        <ValidationMessage For="(()=> Combo.Descripcion)" />
+                    </div>
+                    @*Precio*@
+                    <div class="col-3 ms-5">
+                        <label class="form-label"><strong>Precio</strong></label>
+                        <InputNumber class="form-control" @bind-Value="Combo.Precio"></InputNumber>
+
+                    </div>
+
+                </div>
+            </div>
+            @*Footer*@
+            <div class="card-footer text-center">
+                <button type="button" class="btn btn-primary" @onclick="Volver">Volver</button>
+                <button type="submit" class="btn btn-success">Guardar</button>
+            </div>
+        </div>
+    </div>
+</EditForm>
+
+
+
+@code {
+
+    public Combo Combo { get; set; } = new Combo();
+    public List<Combo> ListaCombo { get; set; } = new List<Combo>();
+
+
+
+    private async Task Guardar()
+    {
+        var creado = await comboService.Guardar(Combo);
+
+        if (creado)
+        {
+            navigationManager.NavigateTo("/Combo/Index");
+        }
+
+
+    }
+
+    private void Volver()
+    {
+        navigationManager.NavigateTo("/Combo/Index");
+    }
+
+}
