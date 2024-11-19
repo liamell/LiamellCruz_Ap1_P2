@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace LiamellCruz_Ap1_P2.Models;
 
@@ -20,6 +21,10 @@ public class Combo
 
     [Required(ErrorMessage = " Campo obligatorio")]
     public int Vendido { get; set; }
+
+
+    [ForeignKey("ComboId")]
+    public ICollection<ComboDetalle> ComboDetalle { get; set; } = new List<ComboDetalle>();
 
 
 }
