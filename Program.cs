@@ -12,6 +12,9 @@ builder.Services.AddRazorComponents()
 
 
 builder.Services.AddScoped<ComboService>();
+builder.Services.AddScoped<ComboDetalleService>();
+builder.Services.AddScoped<ArticuloService>();
+
 builder.Services.AddBlazorBootstrap();
 
 var ConStr = builder.Configuration.GetConnectionString("SqlConStr");
