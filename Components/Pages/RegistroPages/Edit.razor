@@ -50,6 +50,15 @@
 
 					</div>
 
+					@*Vendido*@
+					<div class="col-3 ms-5">
+						<label class="form-label"><strong>Vendido</strong></label>
+						<InputNumber class="form-control" @bind-Value="Combo.Vendido"></InputNumber>
+						<ValidationMessage For="(()=> Combo.Vendido)" />
+
+
+					</div>
+
 
 
 				</div>
