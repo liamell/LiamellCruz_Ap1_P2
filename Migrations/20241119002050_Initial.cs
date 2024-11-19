@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
@@ -11,18 +12,18 @@ namespace LiamellCruz_Ap1_P2.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "Registro",
+                name: "Combo",
                 columns: table => new
                 {
-                    id = table.Column<int>(type: "int", nullable: false)
+                    ComboId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    MyProperty1 = table.Column<int>(type: "int", nullable: false),
-                    MyProperty2 = table.Column<int>(type: "int", nullable: false),
-                    MyProperty3 = table.Column<int>(type: "int", nullable: false)
+                    Fecha = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Descripcion = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Precio = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Registro", x => x.id);
+                    table.PrimaryKey("PK_Combo", x => x.ComboId);
                 });
         }
 
@@ -30,7 +31,7 @@ namespace LiamellCruz_Ap1_P2.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Registro");
+                name: "Combo");
         }
     }
 }
