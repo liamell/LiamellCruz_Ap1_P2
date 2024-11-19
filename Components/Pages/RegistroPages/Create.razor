@@ -2,96 +2,111 @@
 @using LiamellCruz_Ap1_P2.Models
 @using LiamellCruz_Ap1_P2.Service
 @inject ComboService comboService
+@inject ArticuloService articuloService
+@inject ComboDetalleService combodetalleService
 @inject NavigationManager navigationManager
 @rendermode InteractiveServer
 
 
+@*HTML*@
 <PageTitle>Create</PageTitle>
 <EditForm Model="Combo" OnValidSubmit="Guardar">
     <DataAnnotationsValidator />
-    @*Formulario*@
+    <ValidationSummary />
+
     <div class="container">
-        <div class="shadow-lg">
-            @*Header*@
-            <div class="card-header text-center">
-                <h3><strong>Crear Combo</strong></h3>
+        <div class="card shadow-lg">
+            <div class="card-header">
+                <h5 class="card-title">Crear Combo</h5>
             </div>
+
             @*Body*@
             <div class="card-body">
-                <div class="row">
 
-                    @*Id*@
-                    <div class="col-1">
-                        <label class="form-label"><strong>ComboId</strong></label>
-                        <InputNumber class="form-control" @bind-Value="Combo.ComboId" readonly></InputNumber>
-                    </div>
-
-                    @*Fecha*@
-                    <div class="mb-3">
-                        <label class="form-label"><strong>Fecha</strong></label>
-                        <InputDate class="form-control" @bind-Value="Combo.Fecha"></InputDate>
-                    </div>
-
-                    @*Descripcion*@
-                    <div class="col-3 ms-5">
-                        <label class="form-label"><strong>Descripcion</strong></label>
-                        <InputText class="form-control" @bind-Value="Combo.Descripcion"></InputText>
-                        <ValidationMessage For="(()=> Combo.Descripcion)" />
-                    </div>
-
-                    @*Precio*@
-                    <div class="col-3 ms-5">
-                        <label class="form-label"><strong>Precio</strong></label>
-                        <InputNumber class="form-control" @bind-Value="Combo.Precio"></InputNumber>
-
-                    </div>
-
-                    @*Vendido*@
-                    <div class="col-3 ms-5">
-                        <label class="form-label"><strong>Vendido</strong></label>
-                        <InputNumber class="form-control" @bind-Value="Combo.Vendido"></InputNumber>
-
-                    </div>
-
+                @*Id*@
+                <div class="mb-3">
+                    <label class="form-label ms-4"><strong>ComboId</strong></label>
+                    <InputNumber class="form-control"
+                                 @bind-Value="Combo.ComboId" readonly></InputNumber>
                 </div>
+
+                @*Fecha*@
+                <div class="mb-3">
+                    <label class="form-label ms-4"><strong>Fecha</strong></label>
+                    <InputDate class="form-control" @bind-Value="Combo.Fecha"></InputDate>
+                </div>
+
+                @*Descripcion*@
+                <div class="mb-3">
+                    <label class="form-label ms-4"><strong>Descripci&oacute;n</strong></label>
+                    <InputText class="form-control" @bind-Value="Combo.Descripcion"></InputText>
+                </div>
+
             </div>
             @*Footer*@
-            <div class="card-footer text-center">
-                <button type="button" class="btn btn-primary" @onclick="Volver">Volver</button>
-                <button type="submit" class="btn btn-success">Guardar</button>
+            <div class="card-footer text-center mt-2">
+                <a href="/Combo/Index" class="btn btn-secondary"> <span class="bi bi-arrow-left"></span> Volver</a>
+                <button type="submit" class="btn btn-success bi bi-floppy-fill"></button>
+
             </div>
         </div>
+
+        
     </div>
 </EditForm>
 
 
 
+
 @code {
 
-    public Combo Combo { get; set; } = new Combo();
-    public List<Combo> ListaCombo { get; set; } = new List<Combo>();
+     public Combo Combo { get; set; } = new Combo();
+    public List<Articulo> ListaArticulo { get; set; } = new List<Articulo>();
+    public ComboDetalle ComboDetalle { get; set; } = new ComboDetalle();
 
     protected override async Task OnInitializedAsync()
     {
-        ListaCombo = await comboService.Listar(c => c.ComboId > 0);
+        ListaArticulo = await combodetalleService.Listar(a => a.ArticuloId > 0);
     }
 
-
-    private async Task Guardar()
+    public async Task Guardar()
     {
         var creado = await comboService.Guardar(Combo);
 
         if (creado)
         {
+           
             navigationManager.NavigateTo("/Combo/Index");
         }
-
-
+        
     }
 
-    private void Volver()
+    private async Task AgregarArticulo((Articulo articulo, int cantidad) selection)
     {
-        navigationManager.NavigateTo("/Combo/Index");
-    }
 
+        var articuloExistente = Combo.ComboDetalle
+            .FirstOrDefault(d => d.ArticuloId == selection.articulo.ArticuloId);
+
+        if (articuloExistente != null)
+        {
+            articuloExistente.Cantidad += selection.cantidad;
+            articuloExistente.Costo = articuloExistente.Articulo.Costo * articuloExistente.Cantidad;
+        }
+        else
+        {
+            var Detalle = new ComboDetalle
+                {
+                    ArticuloId = selection.articulo.ArticuloId,
+                    Cantidad = selection.cantidad,
+                    Articulo = selection.articulo,
+                    Costo = selection.articulo.Costo * selection.cantidad,
+                    ComboId = Combo.ComboId
+                };
+
+            Combo.ComboDetalle.Add(Detalle);
+        }
+
+        ComboDetalle = new ComboDetalle();
+        await Task.CompletedTask;
+}
 }
