@@ -19,6 +19,7 @@
             @*Body*@
             <div class="card-body">
                 <div class="row">
+
                     @*Id*@
                     <div class="col-1">
                         <label class="form-label"><strong>ComboId</strong></label>
@@ -37,6 +38,7 @@
                         <InputText class="form-control" @bind-Value="Combo.Descripcion"></InputText>
                         <ValidationMessage For="(()=> Combo.Descripcion)" />
                     </div>
+
                     @*Precio*@
                     <div class="col-3 ms-5">
                         <label class="form-label"><strong>Precio</strong></label>
@@ -62,6 +64,10 @@
     public Combo Combo { get; set; } = new Combo();
     public List<Combo> ListaCombo { get; set; } = new List<Combo>();
 
+    protected override async Task OnInitializedAsync()
+    {
+        ListaCombo = await comboService.Listar(c => c.ComboId > 0);
+    }
 
 
     private async Task Guardar()
