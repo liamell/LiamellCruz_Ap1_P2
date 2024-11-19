@@ -1,16 +1,180 @@
-﻿@page "/Regsitro/Index"
+﻿@page "/Combo/Index"
+@using LiamellCruz_Ap1_P2.Models
+@using LiamellCruz_Ap1_P2.Service
+@inject ComboService comboService
 @inject NavigationManager navigationManager
 @rendermode InteractiveServer
 
 
 @*HTML*@
+<PageTitle>Index</PageTitle>
+<div class="container">
+    <div class="card-shadow-lg">
+        @*Header*@
+        <div class="card-header text-center">
+            <h3><strong>Listado de Combos</strong></h3>
+        </div>
+        @*Body*@
+        <div class="card-body">
+            @*Labels*@
+            <div class="row">
+                @*Filtrar por*@
+                <div class="col-3">
+                    <label class="form-label"><strong>Filtrar Por</strong></label>
+                </div>
+                @*ValorFiltro*@
+                <div class="col-4">
+                    <label class="form-label"><strong>B&uacute;squeda</strong></label>
+                </div>
+            </div>
+            @*Inputs y Botones*@
+            <div class="row">
+                @*Filtro*@
+                <div class="col-3">
+                    <InputSelect class="form-select" @bind-Value="Filtro">
+                        <option value="" selected disabled>Elija una opci&oacute;n</option>
+                        <option value="ComoId">ComboId</option>
+                        <option value="Fecha">Fecha</option>
+                        <option value="Descripcion">Descripcion</option>
+                        <option value="Precio">Precio</option>
+                    </InputSelect>
+                </div>
+                @*Busqueda*@
+                <div class="col-4">
+                    <div class="input-group">
+                        <input class="form-control" @bind="ValorFiltro" placeholder="Buscar" />
+                        <button type="button" class="btn btn-outline-primary bi bi-search" @onclick="Buscar"></button>
+                    </div>
+                </div>
+                @*Restablecer*@
+                <div class="col-auto">
+                    <button type="button" class="btn btn-outline-secondary bi bi-arrow-clockwise" @onclick="Restablecer"></button>
+                </div>
+                @*Crear*@
+                <div class="col text-end">
+                    <button type="button" class="btn btn-primary bi bi-plus-circle" @onclick="Crear"></button>
+                </div>
+            </div>
+            <table class="table table-bordered text-center mt-4">
+                <thead>
+                    <tr>
+                        <th>ComboId</th>
+                        <th>Fecha</th>
+                        <th>Descripcion</th>
+                        <th>Precio</th>
+                        <th>Observar</th>
+                        <th>Editar</th>
+                        <th>Eliminar</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var combo in ListaCombo)
+                    {
+                        <tr>
+                            <td>@combo.ComboId</td>
+                            <td>@combo.Fecha </td>
+                            <td>@combo.Descripcion </td>
+                            <td>@combo.Precio </td>
+                            @*Observar Pantalla*@
+                            <td>
+                                <button type="button" class="btn btn-outline-primary bi bi-eye"
+                                @onclick="()=> Observar(combo.ComboId)"></button>
+                            </td>
+                            @*Editar*@
+                            <td>
+                                <button type="button" class="btn btn-outline-warning bi bi-pencil"
+                                @onclick="()=> Editar(combo.ComboId)"></button>
+                            </td>
+                            @*Eliminar*@
+                            <td>
+                                <button type="button" class="btn btn-outline-danger bi bi-trash3"
+                                @onclick="()=> Eliminar(combo.ComboId)"></button>
+                            </td>
+                        </tr>
+                    }
 
+                </tbody>
+            </table>
+        </div>
 
+    </div>
+</div>
 
-
+<button type="button" class="btn btn-outline-primary" @onclick="Prueba">Prueba</button>
 
 
 
 @code {
+
+    public List<Combo> ListaCombo { get; set; } = new List<Combo>();
+    public List<ToastMessage> Mensaje { get; set; } = [];
+
+    public string Filtro { get; set; } = string.Empty;
+    public string ValorFiltro { get; set; } = string.Empty;
+
+    public void Notificacion(ToastType toastType, string tittle, string message) 
+        => Mensaje.Add(ShowToast(toastType, tittle, message));
+
+    private ToastMessage ShowToast(ToastType toastType, string tittle, string message)
+    {
+        var mensaje = new ToastMessage()
+            {
+                Type = toastType,
+                Title = tittle,
+                HelpText = $"{DateTime.Now.ToString("dd/MM/yyyy")}",
+                Message = $"{message}. A las {DateTime.Now.ToString("hh:mm tt")}",
+            };
+        toastService.Notify(mensaje);
+        return mensaje;
+    }
+
+    
+    private async Task Buscar()
+    {
+        if (ValorFiltro.Trim() != "")
+        {
+            if (Filtro == "Id" && int.TryParse(ValorFiltro, out int id))
+                ListaCombo = await comboService.Listar(c => c.ComboId == id);
+            else if (Filtro == "Descripcion")
+                ListaCombo = await comboService.Listar(c => c.Descripcion.ToLower().Contains(ValorFiltro.ToLower()));
+
+        }
+        else
+            ListaCombo = await comboService.Listar(c => c.ComboId > 0);
+    }
+
+    public void Prueba(){
+        Notificacion(ToastType.Primary, "Validado Correctamente", "Hola");
+    }
+
+    private async Task Restablecer()
+    {
+        ListaCombo = await comboService.Listar(c => c.ComboId > 0);
+        Filtro = string.Empty;
+        ValorFiltro = string.Empty;
+    }
+
+    public void Crear()
+    {
+        navigationManager.NavigateTo("/Combo/Create");
+    }
+
+    public void Observar(int id)
+    {
+        navigationManager.NavigateTo($"Combo/Details/{id}");
+    }
+
+    public void Editar(int id)
+    {
+        navigationManager.NavigateTo($"/Combo/Edit/{id}");
+    }
+
+    public void Eliminar(int id)
+    {
+        navigationManager.NavigateTo($"/Combo/Delete/{id}");
+    }
+
+
+
 
 }
