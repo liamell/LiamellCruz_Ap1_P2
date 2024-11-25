@@ -1,0 +1,82 @@
+﻿@using LiamellCruz_Ap1_P2.Models
+@inject ToastService Toast
+
+
+<Toasts class="p-3" AutoHide="true" Delay="4000" Placement="ToastsPlacement.TopRight" />﻿
+<div class="col-auto input-group align-items-center">
+    <InputSelect class="form-select" @bind-Value="ArticuloId">
+
+        <option disabled value="0">Seleccione un producto</option>
+        @foreach (var articulo in ListaArticulo)
+        {
+            <option value="@articulo.ArticuloId">@articulo.Descripcion -- $ @articulo.Precio</option>
+        }
+
+    </InputSelect>
+    @*Cantidad*@
+    <label class="col-form-label input-group-text">Cantidad</label>
+    <InputNumber class="form-control" @bind-Value="Cantidad"></InputNumber>
+    @*Precio*@
+    <label class="col-form-label input-group-text">Costo</label>
+    <InputNumber class="form-control" @bind-Value="Costo" readonly></InputNumber>
+    <button type="button" class="btn btn-success bi bi-plus-square" @onclick="ElegirProducto"></button>
+</div>
+@if (!string.IsNullOrEmpty(Mensaje))
+{
+    <div class="alert alert-danger">@Mensaje</div>
+}
+
+@code {
+    [Parameter]
+    public List<Articulo> ListaArticulo { get; set; } = [];
+
+    [Parameter]
+    public int ArticuloId { get; set; }
+
+    [Parameter]
+    public int Cantidad { get; set; }
+
+    [Parameter]
+    public double Costo { get; set; }
+
+    [Parameter]
+    public EventCallback<(Articulo articulo, int Cantidad)> ProductosSeleccionado { get; set; }
+
+    public string? Mensaje { get; set; } = string.Empty;
+
+
+    private void ActualizarPrecio()
+    {
+        // Buscar el artículo seleccionado
+        var productoSeleccionado = ListaArticulo.FirstOrDefault(a => a.ArticuloId == ArticuloId);
+
+        if (productoSeleccionado != null && Cantidad > 0)
+        {
+            // Calcular el precio basado en el artículo y la cantidad
+            Costo = productoSeleccionado.Precio * Cantidad;
+        }
+        else
+        {
+            Costo = 0; // Si no hay artículo o la cantidad es 0
+        }
+    }
+
+    private async Task ElegirProducto()
+    {
+        if (ArticuloId > 0)
+        {
+            Mensaje = string.Empty;
+            var productoElegido = ListaArticulo.Single(a => a.ArticuloId == ArticuloId);
+            if (productoElegido.Existencia < Cantidad)
+            {
+                Toast.Notify(new(ToastType.Danger, $"La cantidad que solicita es mayor a la existente"));
+                return;
+            }
+            await ProductosSeleccionado.InvokeAsync((productoElegido, Cantidad));
+        }
+        else
+        {
+            Toast.Notify(new(ToastType.Danger, $"Debe seleccionar un articulo y especificar su cantidad"));
+        }
+    }
+}
