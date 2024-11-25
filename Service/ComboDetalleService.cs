@@ -33,14 +33,13 @@ public class ComboDetalleService(IDbContextFactory<Contexto> DbFactory)
     public async Task AfectarCantidad(ComboDetalle detalles, bool resta)
     {
         await using var contexto = await DbFactory.CreateDbContextAsync();
-        // foreach (var item in detalles)
-        // {
+        
         var detalle = await contexto.Articulo.SingleOrDefaultAsync(d => d.ArticuloId == detalles.ArticuloId);
         if (resta)
             detalle.Existencia -= detalles.Cantidad;
         else
             detalle.Existencia += detalles.Cantidad;
-        //}
+        
         await contexto.SaveChangesAsync();
     }
 }
