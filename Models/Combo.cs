@@ -17,7 +17,7 @@ public class Combo
     public string? Descripcion { get; set; }
 
     [Required(ErrorMessage = " Campo obligatorio")]
-    public int Precio { get; set; }
+    public double Precio { get; set; }
 
     [Required(ErrorMessage = " Campo obligatorio")]
     public int Vendido { get; set; }
