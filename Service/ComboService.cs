@@ -16,7 +16,7 @@ public class ComboService(IDbContextFactory<Contexto> DbFactory)
             return await Modificar(combo);
     }
 
-    private async Task<bool> Existe(int id)
+    public async Task<bool> Existe(int id)
     {
         await using var contexto = await DbFactory.CreateDbContextAsync();
         return await contexto.Combo
