@@ -17,9 +17,9 @@ public class Contexto : DbContext
         base.OnModelCreating(modelBuilder);
         modelBuilder.Entity<Articulo>().HasData(new List<Articulo>()
         {
-            new Articulo() {ArticuloId = 1,Descripcion = "Mouse", Precio = 5000},
-            new Articulo() {ArticuloId = 2,Descripcion = "Cable", Precio = 500},
-            new Articulo() {ArticuloId = 3,Descripcion = "Pantalla", Precio = 750}
+            new Articulo() {ArticuloId = 1,Descripcion = "Mouse", Precio = 5000, Costo = 300,Existencia = 10},
+            new Articulo() {ArticuloId = 2,Descripcion = "Cable", Precio = 500, Costo = 300, Existencia = 5},
+            new Articulo() {ArticuloId = 3,Descripcion = "Pantalla", Precio = 750, Costo = 300, Existencia = 09 }
         });
     }
 
