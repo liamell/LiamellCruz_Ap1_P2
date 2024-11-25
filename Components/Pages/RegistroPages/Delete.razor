@@ -1,9 +1,12 @@
 ﻿@page "/Combo/Delete/{id:int}"
 @using LiamellCruz_Ap1_P2.Models
 @using LiamellCruz_Ap1_P2.Service
+@inject ToastService Toast
 @inject ComboService comboService
 @inject NavigationManager navigationManager
 @rendermode InteractiveServer
+
+
 
 <PageTitle> Eliminar Combo</PageTitle>
 <div class="container">
@@ -26,6 +29,21 @@
 
 			</ul>
 		</div>
+
+		@*Detalles de los artículos utilizados en el combo*@ 
+			<div class="border border-success p-2 mt-2">
+			<h5>Detalles de artículos utilizados</h5>
+			<ul class="mt-3">
+				@foreach (var detalle in Combo.ComboDetalle)
+				{
+					<li class="mt-2">
+						Articulo ID: @detalle.ArticuloId -- @detalle.Articulo?.Descripcion --
+						Cantidad: @detalle.Cantidad -- Costo Total: $ @detalle.Costo
+					</li>
+				}
+			</ul>
+		</div>
+
 		@*Footer*@
 		<div class="card-footer text-center">
 			<button type="button" class="btn btn-primary" @onclick="Volver">Volver</button>
@@ -40,30 +58,52 @@
 
 
 @code {
+
 	[Parameter]
-
 	public int ComboId { get; set; }
+
 	public Combo Combo { get; set; } = new Combo();
-	public string Mensaje { get; set; } = string.Empty;
 
-
-
-	private async Task Eliminar()
+	protected override async Task OnInitializedAsync()
 	{
-		var eliminado = await comboService.Eliminar(ComboId);
+		Combo = await comboService.Buscar(ComboId);
+	}
 
-		if (eliminado)
-			Mensaje = "ha sido eliminado correctamente";
+	public async Task Eliminar()
+	{
+		if (!Combo.Vendido)
+		{
+			var eliminado = await comboService.Eliminar(Combo.ComboId);
+			if (eliminado)
+			{
+				Toast.Notify(new ToastMessage(ToastType.Success, "Combo eliminado correctamente"));
+				await Task.Delay(3000); 
+				navigationManager.NavigateTo("Combo/Index"); 
+			}
+			else
+			{
+				Toast.Notify(new ToastMessage(ToastType.Danger, "No se pudo eliminar el combo"));
+			}
+		}
 		else
-
-			Mensaje = "No se ha podido eliminar el T&eacute;cnico";
+		{
+		
+			Toast.Notify(new ToastMessage(ToastType.Danger, "No se puede eliminar el combo porque ya ha sido vendido"));
+			await Task.Delay(3000); 
+			navigationManager.NavigateTo("/Index"); 
+		}
 
 	}
+
 
 	public void Volver()
 	{
+
 		navigationManager.NavigateTo("/Combo/Index");
+
 	}
+
+
 
 
 }

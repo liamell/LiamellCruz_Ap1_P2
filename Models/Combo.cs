@@ -20,7 +20,7 @@ public class Combo
     public double Precio { get; set; }
 
     [Required(ErrorMessage = " Campo obligatorio")]
-    public int Vendido { get; set; }
+    public bool Vendido { get; set; }
 
 
     [ForeignKey("ComboId")]

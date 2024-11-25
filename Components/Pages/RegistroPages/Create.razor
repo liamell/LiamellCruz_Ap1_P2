@@ -101,7 +101,7 @@
                 Costo = selection.articulo.Costo * selection.Cantidad,
             };
 
-            Combo.ComboDetalle.Add(nuevoDetalle);  // Añadimos el nuevo detalle
+            Combo.ComboDetalle.Add(nuevoDetalle);  
         }
         await Task.CompletedTask;
     }
@@ -146,4 +146,5 @@
             Toast.Notify(new ToastMessage(ToastType.Danger, $"Error al eliminar el producto"));
         }
     }
+
 }

@@ -1,115 +1,150 @@
 ﻿@page "/Combo/Edit/{id:int}"
 @using LiamellCruz_Ap1_P2.Models
 @using LiamellCruz_Ap1_P2.Service
+@inject ToastService Toast
+@inject ArticuloService articuloService
+@inject ComboDetalleService combodetalleService
 @inject ComboService comboService
 @inject NavigationManager navigationManager
 @rendermode InteractiveServer
 
 
-<PageTitle>Modificar &eacute;cnicoS</PageTitle>
+
+<Toasts class="p-3" AutoHide="true" Delay="2000" Placement="ToastsPlacement.TopRight" />
+
+<PageTitle>Edit</PageTitle>
 <EditForm Model="Combo" OnValidSubmit="Modificar">
-	<DataAnnotationsValidator />
-	@*Formulario*@
-	<div class="container">
-		<div class="shadow-lg">
-			@*Header*@
-			<div class="card-header text-center">
-				<h3><strong>Editar Combo</strong></h3>
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    <div class="container"/>
+        <div class="card shadow-lg">
+            <div class="card-header">
+                <h5 class="card-title">Editar Combo</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label class="form-label"><strong>ComboId</strong></label>
+                    <InputNumber class="form-control" @bind-Value="Combo.ComboId" readonly></InputNumber>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label"><strong>Fecha</strong></label>
+                    <InputDate class="form-control" @bind-Value="Combo.Fecha"></InputDate>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label"><strong>Descripción</strong></label>
+                    <InputText class="form-control" @bind-Value="Combo.Descripcion"></InputText>
+                
 
-			</div>
-			@*Body*@
-			<div class="card-body">
-				<div class="row">
-					@*id*@
-					<div class="col-1">
-						<label class="form-label"><strong>ComboId</strong></label>
-						<InputNumber class="form-control" @bind-Value="Combo.ComboId" readonly></InputNumber>
-					</div>
-
-					@*Fecha*@
-					<div class="mb-3">
-						<label class="form-label"><strong>Fecha</strong></label>
-						<InputDate class="form-control" @bind-Value="Combo.Fecha"></InputDate>
-					</div>
-
-					@*Descripcion*@
-					<div class="col-3 ms-5">
-						<label class="form-label"><strong>Descripcion</strong></label>
-						<InputText class="form-control" @bind-Value="Combo.Descripcion"></InputText>
-						<ValidationMessage For="(()=> Combo.Descripcion)" />
-
-
-					</div>
-
-					@*Precio*@
-					<div class="col-3 ms-5">
-						<label class="form-label"><strong>Precio</strong></label>
-						<InputNumber class="form-control" @bind-Value="Combo.Precio"></InputNumber>
-						<ValidationMessage For="(()=> Combo.Precio)" />
-
-
-					</div>
-
-					@*Vendido*@
-					<div class="col-3 ms-5">
-						<label class="form-label"><strong>Vendido</strong></label>
-						<InputNumber class="form-control" @bind-Value="Combo.Vendido"></InputNumber>
-						<ValidationMessage For="(()=> Combo.Vendido)" />
-
-
-					</div>
-
-
-
-				</div>
-				@*footer*@
-				<div class="card-footer text-center">
-					<button Type="button" Class="btn btn-primary" @onclick="Volver">Volver</button>
-					<button Type="submit" Class="btn btn-success">Modificar</button>
-				</div>
-
-
-			</div>
-
-
-		</div>
-
-
-
-	</div>
+                <div class="border border-success p-3 mt-3">
+                    <h5>Detalles de artículos utilizados</h5>
+                    <div class="row">
+                        <div class="col-auto">
+                            <AgregarArticulos ListaArticulo="ListaArticulo"
+                                              ArticuloId="ComboDetalle.ArticuloId"
+                                              Cantidad="ComboDetalle.Cantidad"
+                                              Costo="ComboDetalle.Costo"
+                                              ProductosSeleccionado="AgregarDetalle" />
+                        </div>
+                    </div>
+                    <ul class="mt-3">
+                        @foreach (var detalle in Combo.ComboDetalle)
+                        {
+                            <li class="mt-2">
+                                Articulo ID: @detalle.ArticuloId -- @detalle.Articulo?.Descripcion -- Cantidad: @detalle.Cantidad -- Costo Total: $ @detalle.Costo
+                                <button type="button" @onclick="() => Eliminar(detalle)" class="btn btn-outline-danger btn-sm ms-2 bi bi-trash"></button>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            </div>
+            <div class="card-footer text-center mt-2">
+                <a href="/Combo/Index" class="btn btn-secondary"> <span class="bi bi-arrow-left"></span> Volver</a>
+                <button type="submit" class="btn btn-success bi bi-floppy-fill">Guardar</button>
+            </div>
+        </div>
+    </div>
 </EditForm>
 
+@Mensaje
 
 @code {
-	[Parameter]
-	public int ComboId { get; set; }
-	public Combo Combo { get; set; } = new Combo();
-	public string Mensaje { get; set; } = string.Empty;
+    [Parameter]
+    public int ComboId { get; set; }
 
-	protected override async Task OnInitializedAsync()
-	{
-		Combo = await comboService.Buscar(ComboId);
+    public Combo Combo { get; set; } = new Combo();
+    public string Mensaje { get; set; } = string.Empty;
+    public List<Articulo> ListaArticulo { get; set; } = new List<Articulo>();
+    public ComboDetalle ComboDetalle { get; set; } = new ComboDetalle();
 
-	}
+    protected override async Task OnInitializedAsync()
+    {
+        Combo = await comboService.Buscar(ComboId);
+        ListaArticulo = await articuloService.Listar(a => a.ArticuloId > 0);
+    }
 
-	public async Task Modificar()
-	{
-	
+    private async Task<bool> Validar()
+    {
+        var valido = await comboService.Existe(Combo.ComboId);
+        return valido;
+    }
 
-		var Modificar = await comboService.Guardar(Combo);
+    private async Task AgregarDetalle((Articulo articulo, int Cantidad) selection)
+    {
+        var ArticuloExiste = Combo.ComboDetalle.FirstOrDefault(A => A.ArticuloId == selection.articulo.ArticuloId);
+        if (ArticuloExiste != null)
+        {
+            ArticuloExiste.Cantidad += selection.Cantidad;
+            ArticuloExiste.Costo = ArticuloExiste.Articulo.Costo * ArticuloExiste.Cantidad;
+        }
+        else
+        {
+            var nuevoDetalle = new ComboDetalle
+                {
+                    ArticuloId = selection.articulo.ArticuloId,
+                    Cantidad = selection.Cantidad,
+                    Costo = selection.articulo.Costo * selection.Cantidad,
+                };
 
-		if (Modificar)
-			Mensaje = "Se ha modificado correctamente";
+            Combo.ComboDetalle.Add(nuevoDetalle);
+        }
+        await Task.CompletedTask;
+    }
 
-		else
-			Mensaje = "No se ha Modificado correctamente";
-	}
+    private async Task Modificar()
+    {
+        Combo.Precio = Combo.ComboDetalle.Sum(d => d.Costo);
+        var modificar = await comboService.Guardar(Combo);
 
-	
-	public void Volver()
-	{
-		navigationManager.NavigateTo("/Combo/Index");
-	}
+        if (modificar)
+        {
+            Toast.Notify(new ToastMessage(ToastType.Success, $"Modificado correctamente"));
+            await Task.Delay(2000);
+            navigationManager.NavigateTo("/Combo/Index");
+        }
+        else
+        {
+            Toast.Notify(new ToastMessage(ToastType.Danger, $"No se ha modificado correctamente"));
+        }
+    }
 
+    public async Task Eliminar(ComboDetalle detalle)
+    {
+        var resultado = await combodetalleService.Eliminar(detalle.DetalleId);
+
+        if (resultado)
+        {
+            Combo.ComboDetalle.Remove(detalle);
+            ComboDetalle.Cantidad = detalle.Cantidad;
+            ComboDetalle.ArticuloId = detalle.ArticuloId;
+
+            Toast.Notify(new ToastMessage(ToastType.Success, $"Artículo eliminado correctamente"));
+        }
+        else
+        {
+            Toast.Notify(new ToastMessage(ToastType.Danger, $"Error al eliminar el artículo"));
+        }
+    }
+
+    
 
 }
