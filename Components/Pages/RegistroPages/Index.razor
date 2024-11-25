@@ -104,35 +104,18 @@
     </div>
 </div>
 
-<button type="button" class="btn btn-outline-primary" @onclick="Prueba">Prueba</button>
+
 
 
 
 @code {
 
     public List<Combo> ListaCombo { get; set; } = new List<Combo>();
-    public List<ToastMessage> Mensaje { get; set; } = [];
+  
 
     public string Filtro { get; set; } = string.Empty;
     public string ValorFiltro { get; set; } = string.Empty;
 
-    public void Notificacion(ToastType toastType, string tittle, string message) 
-        => Mensaje.Add(ShowToast(toastType, tittle, message));
-
-    private ToastMessage ShowToast(ToastType toastType, string tittle, string message)
-    {
-        var mensaje = new ToastMessage()
-            {
-                Type = toastType,
-                Title = tittle,
-                HelpText = $"{DateTime.Now.ToString("dd/MM/yyyy")}",
-                Message = $"{message}. A las {DateTime.Now.ToString("hh:mm tt")}",
-            };
-        toastService.Notify(mensaje);
-        return mensaje;
-    }
-
-    
     private async Task Buscar()
     {
         if (ValorFiltro.Trim() != "")
@@ -147,10 +130,7 @@
             ListaCombo = await comboService.Listar(c => c.ComboId > 0);
     }
 
-    public void Prueba(){
-        Notificacion(ToastType.Primary, "Validado Correctamente", "Hola");
-    }
-
+   
     private async Task Restablecer()
     {
         ListaCombo = await comboService.Listar(c => c.ComboId > 0);

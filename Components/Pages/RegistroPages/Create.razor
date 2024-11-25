@@ -15,6 +15,7 @@
 <EditForm Model="Combo" OnValidSubmit="Guardar">
     <DataAnnotationsValidator />
     <ValidationSummary />
+
     <div class="container">
         <div class="card shadow-lg">
             <div class="card-header">
@@ -86,25 +87,44 @@
 
     private async Task AgregarDetalle((Articulo articulo, int Cantidad) selection)
     {
+        // Busca si ya existe un detalle para el artículo seleccionado
         var ArticuloExiste = Combo.ComboDetalle.FirstOrDefault(A => A.ArticuloId == selection.articulo.ArticuloId);
+
         if (ArticuloExiste != null)
         {
+            // Si el artículo ya está en los detalles, actualiza la cantidad y el costo
             ArticuloExiste.Cantidad += selection.Cantidad;
-            ArticuloExiste.Costo = ArticuloExiste.Articulo.Costo * ArticuloExiste.Cantidad;
+            ArticuloExiste.Costo = selection.articulo.Costo * ArticuloExiste.Cantidad;
         }
         else
         {
-            var nuevoDetalle = new ComboDetalle
+            // Asegúrate de que el artículo seleccionado tiene un costo válido
+            if (selection.articulo.Costo <= 0)
             {
-                ArticuloId = selection.articulo.ArticuloId,
-                Cantidad = selection.Cantidad,
-                Costo = selection.articulo.Costo * selection.Cantidad,
-            };
+                Toast.Notify(new ToastMessage(ToastType.Danger, $"El artículo seleccionado no tiene un costo válido."));
+                return;
+            }
 
-            Combo.ComboDetalle.Add(nuevoDetalle);  
+            // Crea un nuevo detalle
+            var nuevoDetalle = new ComboDetalle
+                {
+                    ArticuloId = selection.articulo.ArticuloId,
+                    Cantidad = selection.Cantidad,
+                    Costo = selection.articulo.Costo * selection.Cantidad,
+                    Articulo = selection.articulo // Relaciona el artículo completo
+                };
+
+            Combo.ComboDetalle.Add(nuevoDetalle);
         }
+
         await Task.CompletedTask;
     }
+
+
+
+
+
+
 
     private async Task Guardar()
     {
@@ -114,7 +134,22 @@
             return;
         }
 
+        if (Combo.ComboDetalle == null || !Combo.ComboDetalle.Any())
+        {
+            Toast.Notify(new ToastMessage(ToastType.Warning, $"El combo no tiene detalles. Agregue al menos un artículo."));
+            return;
+        }
+
+        // Calcula el precio total del combo
         Combo.Precio = Combo.ComboDetalle.Sum(d => d.Costo);
+
+        if (Combo.Precio <= 0)
+        {
+            Toast.Notify(new ToastMessage(ToastType.Warning, $"El combo no tiene un precio válido."));
+            return;
+        }
+
+        // Guarda el combo
         var crear = await comboService.Guardar(Combo);
 
         if (crear)
@@ -128,6 +163,8 @@
             Toast.Notify(new ToastMessage(ToastType.Danger, $"No se ha creado correctamente"));
         }
     }
+
+
 
     public async Task Eliminar(ComboDetalle detalle)
     {
