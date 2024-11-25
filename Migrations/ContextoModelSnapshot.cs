@@ -51,25 +51,25 @@ namespace LiamellCruz_Ap1_P2.Migrations
                         new
                         {
                             ArticuloId = 1,
-                            Costo = 0.0,
+                            Costo = 300.0,
                             Descripcion = "Mouse",
-                            Existencia = 0,
+                            Existencia = 10,
                             Precio = 5000.0
                         },
                         new
                         {
                             ArticuloId = 2,
-                            Costo = 0.0,
+                            Costo = 300.0,
                             Descripcion = "Cable",
-                            Existencia = 0,
+                            Existencia = 5,
                             Precio = 500.0
                         },
                         new
                         {
                             ArticuloId = 3,
-                            Costo = 0.0,
+                            Costo = 300.0,
                             Descripcion = "Pantalla",
-                            Existencia = 0,
+                            Existencia = 9,
                             Precio = 750.0
                         });
                 });
@@ -89,11 +89,11 @@ namespace LiamellCruz_Ap1_P2.Migrations
                     b.Property<DateTime>("Fecha")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("Precio")
-                        .HasColumnType("int");
+                    b.Property<double>("Precio")
+                        .HasColumnType("float");
 
-                    b.Property<int>("Vendido")
-                        .HasColumnType("int");
+                    b.Property<bool>("Vendido")
+                        .HasColumnType("bit");
 
                     b.HasKey("ComboId");
 

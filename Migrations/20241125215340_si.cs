@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
@@ -12,13 +13,6 @@ namespace LiamellCruz_Ap1_P2.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AddColumn<int>(
-                name: "Vendido",
-                table: "Combo",
-                type: "int",
-                nullable: false,
-                defaultValue: 0);
-
             migrationBuilder.CreateTable(
                 name: "Articulo",
                 columns: table => new
@@ -33,6 +27,22 @@ namespace LiamellCruz_Ap1_P2.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Articulo", x => x.ArticuloId);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Combo",
+                columns: table => new
+                {
+                    ComboId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Fecha = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Descripcion = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Precio = table.Column<double>(type: "float", nullable: false),
+                    Vendido = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Combo", x => x.ComboId);
                 });
 
             migrationBuilder.CreateTable(
@@ -68,9 +78,9 @@ namespace LiamellCruz_Ap1_P2.Migrations
                 columns: new[] { "ArticuloId", "Costo", "Descripcion", "Existencia", "Precio" },
                 values: new object[,]
                 {
-                    { 1, 0.0, "Mouse", 0, 5000.0 },
-                    { 2, 0.0, "Cable", 0, 500.0 },
-                    { 3, 0.0, "Pantalla", 0, 750.0 }
+                    { 1, 300.0, "Mouse", 10, 5000.0 },
+                    { 2, 300.0, "Cable", 5, 500.0 },
+                    { 3, 300.0, "Pantalla", 9, 750.0 }
                 });
 
             migrationBuilder.CreateIndex(
@@ -93,9 +103,8 @@ namespace LiamellCruz_Ap1_P2.Migrations
             migrationBuilder.DropTable(
                 name: "Articulo");
 
-            migrationBuilder.DropColumn(
-                name: "Vendido",
-                table: "Combo");
+            migrationBuilder.DropTable(
+                name: "Combo");
         }
     }
 }
