@@ -1,4 +1,4 @@
-﻿@page "/Combo/Edit/{id:int}"
+﻿@page "/Combo/Edit/{ComboId:int}"
 @using LiamellCruz_Ap1_P2.Models
 @using LiamellCruz_Ap1_P2.Service
 @inject ToastService Toast
@@ -82,7 +82,7 @@
         ListaArticulo = await articuloService.Listar(a => a.ArticuloId > 0);
     }
 
-    private async Task<bool> Validar()
+    public async Task<bool> Validar()
     {
         var valido = await comboService.Existe(Combo.ComboId);
         return valido;

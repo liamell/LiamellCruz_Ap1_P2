@@ -79,7 +79,7 @@
         ListaArticulo = await articuloService.Listar(a => a.ArticuloId > 0);
     }
 
-    private async Task<bool> Validar()
+    public async Task<bool> Validar()
     {
         var valido = await comboService.Existe(Combo.ComboId);
         return valido;

@@ -1,4 +1,4 @@
-﻿@page "/Combo/Details/{id:int}"
+﻿@page "/Combo/Details/{ComboId:int}"
 @using LiamellCruz_Ap1_P2.Models
 @using LiamellCruz_Ap1_P2.Service
 @inject ComboService comboService
@@ -34,6 +34,7 @@
 
 @code {
 	[Parameter]
+
 	public int ComboId { get; set; }
 
 	public Combo Combo { get; set; } = new Combo();

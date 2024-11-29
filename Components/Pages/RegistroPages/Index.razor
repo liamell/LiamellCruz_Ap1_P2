@@ -116,18 +116,30 @@
     public string Filtro { get; set; } = string.Empty;
     public string ValorFiltro { get; set; } = string.Empty;
 
+    protected override async Task OnInitializedAsync()
+    {
+        ListaCombo = await comboService.Listar(c => c.ComboId > 0); // Carga inicial
+    }
+
+
     private async Task Buscar()
     {
         if (ValorFiltro.Trim() != "")
         {
-            if (Filtro == "Id" && int.TryParse(ValorFiltro, out int id))
+            if (Filtro == "ComboId" && int.TryParse(ValorFiltro, out int id))
+            {
                 ListaCombo = await comboService.Listar(c => c.ComboId == id);
+            }
             else if (Filtro == "Descripcion")
+            {
                 ListaCombo = await comboService.Listar(c => c.Descripcion.ToLower().Contains(ValorFiltro.ToLower()));
-
+            }
+           
         }
         else
+        {
             ListaCombo = await comboService.Listar(c => c.ComboId > 0);
+        }
     }
 
    
